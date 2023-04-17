@@ -20,5 +20,6 @@ public class UrlMappingConstant {
      * CLIENTS
      */
     public static final String CLIENTS = "/clients";
-    public static final String CLIENTS_SHARED_KEY = "{sharedKey}";
+    public static final String CLIENTS_PAGE = "/page";
+    public static final String CLIENTS_ALL = "/all";
 }

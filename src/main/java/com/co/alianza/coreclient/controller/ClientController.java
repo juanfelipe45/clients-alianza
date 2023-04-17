@@ -13,6 +13,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 import static com.co.alianza.coreclient.constants.UrlMappingConstant.*;
 
 @RestController
@@ -27,7 +30,16 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    @GetMapping
+    @GetMapping(value = CLIENTS_ALL)
+    @ApiResponseErrorModel
+    @ApiOperation("Get Clients with pagination and order")
+    public ResponseEntity<GeneralResponse<List<ClientDTO>>> findAll() throws AlianzaClientException {
+        return ResponseEntity.ok(new GeneralResponse<>(
+                new HeaderResponse(200, ""),
+                this.clientService.findAll()
+        ));
+    }
+    @GetMapping(value = CLIENTS_PAGE)
     @ApiResponseErrorModel
     @ApiOperation("Get Clients with pagination and order")
     public ResponseEntity<GeneralResponse<PageResponse<ClientDTO>>> searchClients(

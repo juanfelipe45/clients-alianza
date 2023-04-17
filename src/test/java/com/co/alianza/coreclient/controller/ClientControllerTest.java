@@ -44,20 +44,40 @@ class ClientControllerTest {
     private IClientRepository clientRepository;
 
     /**
-     * GET searchClients
+     * GET findAll
      */
 
     @Test
-    @DisplayName("Given a bac request, when calling searchClients() method and params are null or empty")
-    void given_bad_request_in_searchClients_when_params_is_empty() {
-        try {
-            this.clientController.searchClients(null, null, null ,null, null, null, 0, 10, null, null);
-        } catch (AlianzaClientException e) {
-            assertSame(BusinessErrorEnum.PARAMS_REQUIRED.getHttpStatus(), e.getHttpStatus());
-            assertSame(BusinessErrorEnum.PARAMS_REQUIRED.getMessage(), e.getBusinessMessage());
-            assertEquals(BusinessErrorEnum.PARAMS_REQUIRED.getHttpStatus().value(), e.getBusinessCode());
-        }
+    @DisplayName("Given ok, when calling findAll() ")
+    void given_Ok_in_findAll() throws AlianzaClientException {
+
+        Client clientMock;
+        List<Client> clientsMock = new ArrayList<>();
+
+        clientMock = new Client("jgutierrez",
+                "Julian Gutierrez",
+                "jgutierrez@gmail.com",
+                "3219876543",
+                DateUtil.formatStringToLocaleDate("15/04/2023"));
+
+        clientsMock.add(clientMock);
+
+
+        Mockito.when(this.clientRepository.findAll()).thenReturn(clientsMock);
+
+        ResponseEntity<GeneralResponse<List<ClientDTO>>> response = this.clientController.findAll();
+
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertNotNull(response.getBody().getHeader());
+        assertEquals(HttpStatus.OK.value(), response.getBody().getHeader().getCode());
+        assertSame(clientsMock.size(), response.getBody().getBody().size());
+
     }
+
+    /**
+     * GET searchClients
+     */
 
     @Test
     @DisplayName("Given a bac request, when calling searchClients() method and toCreationDate is null and fromCreationDate is not null")
@@ -65,7 +85,7 @@ class ClientControllerTest {
         try {
             this.clientController.searchClients(null, null, null ,null,
                     "16/04/2023", null,
-                    0, 10, null, null);
+                    0, 10, "mock", Sort.Direction.ASC);
         } catch (AlianzaClientException e) {
             assertSame(BusinessErrorEnum.DATES_REQUIRED.getHttpStatus(), e.getHttpStatus());
             assertSame(BusinessErrorEnum.DATES_REQUIRED.getMessage(), e.getBusinessMessage());

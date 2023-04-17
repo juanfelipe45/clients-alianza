@@ -6,6 +6,7 @@ import com.co.alianza.coreclient.exception.AlianzaClientException;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface IClientService {
 
@@ -15,4 +16,6 @@ public interface IClientService {
     PageResponse<ClientDTO> getClient(String sharedKey,  String name, String email,
             String phone, LocalDate fromCreationDate, LocalDate toCreationDate,
             int pageIndex, int pageSize, String sortField, Sort.Direction sortOrder) throws AlianzaClientException;
+
+    List<ClientDTO> findAll() throws AlianzaClientException;
 }

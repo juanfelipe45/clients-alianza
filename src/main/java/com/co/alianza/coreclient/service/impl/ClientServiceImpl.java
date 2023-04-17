@@ -42,6 +42,27 @@ public class ClientServiceImpl implements IClientService {
     }
 
     @Override
+    public List<ClientDTO> findAll() {
+        String methodComponent = Thread.currentThread().getStackTrace()[1].getMethodName();
+
+        long endTimeConsult;
+        long startTimeConsult = 0;
+        long startTime = System.currentTimeMillis();
+
+        logger.info(LoggerUtil.getLogStartMethod(methodComponent));
+
+        startTimeConsult = System.currentTimeMillis();
+        List<Client> clientList = clientRepository.findAll();
+        endTimeConsult = System.currentTimeMillis();
+
+        this.generateLogsTime(startTime, endTimeConsult, startTimeConsult);
+
+        return clientList.stream()
+                .map(client -> entityDtoMapper.toDto(client, ClientDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public ClientDTO create(ClientDTO client) throws AlianzaClientException {
         String methodComponent = Thread.currentThread().getStackTrace()[1].getMethodName();
@@ -71,7 +92,7 @@ public class ClientServiceImpl implements IClientService {
         long startTimeConsult;
         long endTimeConsult ;
 
-        this.isValidParamsGetClient(sharedKey, name, email, phone, fromCreationDate, toCreationDate, methodComponent);
+        this.isValidParamsGetClient(fromCreationDate, toCreationDate, methodComponent);
 
         logger.info(LoggerUtil.getLogStartMethod(methodComponent, "sharedKey:" + sharedKey,
                 "name:" + name, "email:" + email, "phone:" + phone, "fromCreationDate:" + fromCreationDate,
@@ -103,14 +124,7 @@ public class ClientServiceImpl implements IClientService {
         return new PageResponse<>(clients, pageClient.getTotalElements());
     }
 
-    private void isValidParamsGetClient(String sharedKey, String name, String email,
-                                            String phone, LocalDate fromCreationDate, LocalDate toCreationDate,
-                                            String methodComponent) throws AlianzaClientException {
-
-        if (Util.validateEmptyParams(sharedKey, name, email, phone, fromCreationDate, toCreationDate)) {
-            logger.error(LoggerUtil.generateErrorLog(methodComponent, BusinessErrorEnum.PARAMS_REQUIRED.getMessage()));
-            throw new AlianzaClientException(BusinessErrorEnum.PARAMS_REQUIRED);
-        }
+    private void isValidParamsGetClient(LocalDate fromCreationDate, LocalDate toCreationDate, String methodComponent) throws AlianzaClientException {
 
         if (
                 (Util.isNullOrEmptyObject(toCreationDate) && !Util.isNullOrEmptyObject(fromCreationDate)) ||
